@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Track your intermittent fasting journey">
+    <title>Fasting Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 448px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6B7280;
+            font-size: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            background: white;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: #F3F4F6;
+        }
+
+        .tab.active {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .fasting-card {
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .fasting-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .fasting-card-header svg {
+            width: 20px;
+            height: 20px;
+            color: #4F46E5;
+        }
+
+        .fasting-card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .fasting-time {
+            text-align: center;
+        }
+
+        .fasting-time-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4F46E5;
+            margin-bottom: 8px;
+        }
+
+        .fasting-time-subtitle {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 16px;
+        }
+
+        .meal-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 8px;
+        }
+
+        .meal-info .meal-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .meal-info .meal-time {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .delete-btn {
+            color: #EF4444;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .delete-btn:hover {
+            color: #DC2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6B7280;
+            padding: 32px 0;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .week-nav button {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4F46E5;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .week-nav button:hover:not(:disabled) {
+            background: #EEF2FF;
+        }
+
+        .week-nav button:disabled {
+            color: #D1D5DB;
+            cursor: not-allowed;
+        }
+
+        .week-date-range {
+            text-align: center;
+        }
+
+        .week-date-range .dates {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+        }
+
+        .week-date-range .current-week {
+            font-size: 12px;
+            color: #4F46E5;
+            font-weight: 500;
+        }
+
+        .day-card {
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            margin-bottom: 12px;
+        }
+
+        .day-card.today {
+            background: #EEF2FF;
+            border-color: #C7D2FE;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .day-name {
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .day-card.today .day-name {
+            color: #4F46E5;
+        }
+
+        .day-date {
+            font-size: 14px;
+            color: #6B7280;
+            margin-left: 8px;
+        }
+
+        .meal-count {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .day-fasting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+
+        .no-data {
+            font-size: 14px;
+            color: #D1D5DB;
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .history-date {
+            font-weight: 500;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .history-meal {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 8px 16px;
+        }
+
+        .history-meal-info {
+            color: #1F2937;
+        }
+
+        .history-meal-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .history-meal-time {
+            font-weight: 500;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .fab:hover {
+            background: #4338CA;
+        }
+
+        .fab svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px 24px 0 0;
+            width: 100%;
+            max-width: 448px;
+            padding: 24px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @media (min-width: 640px) {
+            .modal-overlay {
+                align-items: center;
+            }
+            .modal {
+                border-radius: 24px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #D1D5DB;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #F9FAFB;
+        }
+
+        .btn-primary {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338CA;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fasting Tracker</h1>
+            <p>Track your intermittent fasting journey</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-view="today">Today</button>
+            <button class="tab" data-view="week">Week</button>
+            <button class="tab" data-view="history">History</button>
+        </div>
+
+        <div id="todayView">
+            <!-- Today's content will be injected here -->
+        </div>
+
+        <div id="weekView" class="hidden">
+            <!-- Week content will be injected here -->
+        </div>
+
+        <div id="historyView" class="hidden">
+            <!-- History content will be injected here -->
+        </div>
+    </div>
+
+    <button class="fab" id="addMealBtn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+    </button>
+
+    <div class="modal-overlay hidden" id="modalOverlay">
+        <div class="modal">
+            <h2>Log Meal</h2>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-input" id="mealDate">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Time</label>
+                <input type="time" class="form-input" id="mealTime">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveMealBtn">Add Meal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let meals = [];
+        let currentView = 'today';
+        let selectedWeek = 0;
+
+        // Initialize
+        function init() {
+            loadMeals();
+            setCurrentDateTime();
+            setupEventListeners();
+            renderCurrentView();
+        }
+
+        // Load meals from localStorage
+        function loadMeals() {
+            const saved = localStorage.getItem('fastingMeals');
+            if (saved) {
+                meals = JSON.parse(saved);
+            }
+        }
+
+        // Save meals to localStorage
+        function saveMeals() {
+            localStorage.setItem('fastingMeals', JSON.stringify(meals));
+        }
+
+        // Set current date and time in form
+        function setCurrentDateTime() {
+            const now = new Date();
+            document.getElementById('mealDate').value = now.toISOString().split('T')[0];
+            document.getElementById('mealTime').value = now.toTimeString().slice(0, 5);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentView = tab.dataset.view;
+                    renderCurrentView();
+                });
+            });
+
+            // Modal controls
+            document.getElementById('addMealBtn').addEventListener('click', openModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('saveMealBtn').addEventListener('click', addMeal);
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'modalOverlay') closeModal();
+            });
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            setCurrentDateTime();
+        }
+
+        // Add meal
+        function addMeal() {
+            const date = document.getElementById('mealDate').value;
+            const time = document.getElementById('mealTime').value;
+
+            if (!date || !time) return;
+
+            const newMeal = {
+                id: Date.now(),
+                datetime: `${date}T${time}`,
+                date: date,
+                time: time
+            };
+
+            meals.push(newMeal);
+            meals.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+            saveMeals();
+            closeModal();
+            renderCurrentView();
+        }
+
+        // Delete meal
+        function deleteMeal(id) {
+            meals = meals.filter(m => m.id !== id);
+            saveMeals();
+            renderCurrentView();
+        }
+
+        // Get meals grouped by date
+        function getMealsByDate() {
+            const byDate = {};
+            meals.forEach(meal => {
+                if (!byDate[meal.date]) {
+                    byDate[meal.date] = [];
+                }
+                byDate[meal.date].push(meal);
+            });
+            return byDate;
+        }
+
+        // Calculate fasting time
+        function calculateFastingTime(firstMeal, lastMealPrev) {
+            if (!firstMeal || !lastMealPrev) return null;
+            const diff = new Date(firstMeal.datetime) - new Date(lastMealPrev.datetime);
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            return { hours, minutes };
+        }
+
+        // Format functions
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':');
+            const h = parseInt(hours);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const displayHour = h % 12 || 12;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        // Get week dates
+        function getWeekDates(weekOffset = 0) {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            monday.setDate(monday.getDate() + (weekOffset * 7));
+
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                dates.push(date.toISOString().split('T')[0]);
+            }
+            return dates;
+        }
+
+        // Render views
+        function renderCurrentView() {
+            document.getElementById('todayView').classList.add('hidden');
+            document.getElementById('weekView').classList.add('hidden');
+            document.getElementById('historyView').classList.add('hidden');
+
+            if (currentView === 'today') {
+                document.getElementById('todayView').classList.remove('hidden');
+                renderTodayView();
+            } else if (currentView === 'week') {
+                document.getElementById('weekView').classList.remove('hidden');
+                renderWeekView();
+            } else {
+                document.getElementById('historyView').classList.remove('hidden');
+                renderHistoryView();
+            }
+        }
+
+        function renderTodayView() {
+            const today = new Date().toISOString().split('T')[0];
+            const mealsByDate = getMealsByDate();
+            const todayMeals = mealsByDate[today] || [];
+            const yesterday = new Date(new Date(today).setDate(new Date(today).getDate() - 1))
+                .toISOString().split('T')[0];
+            const yesterdayMeals = mealsByDate[yesterday] || [];
+
+            const firstMealToday = todayMeals[0];
+            const lastMealYesterday = yesterdayMeals[yesterdayMeals.length - 1];
+            const fastingTime = calculateFastingTime(firstMealToday, lastMealYesterday);
+
+            let html = `
+                <div class="fasting-card">
+                    <div class="fasting-card-header">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2>Today's Fasting Window</h2>
+                    </div>
+                    <div class="fasting-time">
+            `;
+
+            if (fastingTime) {
+                html += `
+                    <div class="fasting-time-display">${fastingTime.hours}h ${fastingTime.minutes}m</div>
+                    <p class="fasting-time-subtitle">
+                        From ${formatTime(lastMealYesterday.time)} yesterday to ${formatTime(firstMealToday.time)} today
+                    </p>
+                `;
+            } else {
+                html += `<p class="fasting-time-subtitle">Log your first meal today to see fasting time</p>`;
+            }
+
+            html += `
+                    </div>
+                </div>
+                <h3 class="section-title">Today's Meals</h3>
+            `;
+
+            if (todayMeals.length > 0) {
+                todayMeals.forEach((meal, idx) => {
+                    html += `
+                        <div class="meal-card">
+                            <div class="meal-info">
+                                <div class="meal-label">Meal ${idx + 1}</div>
+                                <div class="meal-time">${formatTime(meal.time)}</div>
+                            </div>
+                            <button class="delete-btn" onclick="deleteMeal(${meal.id})">Delete</button>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<p class="empty-state">No meals logged today</p>`;
+            }
+
+            document.getElementById('todayView').innerHTML = html;
+        }
+
+        function renderWeekView() {
+            const weekDates = getWeekDates(selectedWeek);
+            const mealsByDate = getMealsByDate();
+            const isCurrentWeek = selectedWeek === 0;
+
+            const weekStart = new Date(weekDates[0]);
+            const weekEnd = new Date(weekDates[6]);
+
+            let html = `
+                <div class="week-nav">
+                    <button onclick="changeWeek(1)">← Previous</button>
+                    <div class="week-date-range">
+                        <div class="dates">
+                            ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - 
+                            ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                        ${isCurrentWeek ? '<div class="current-week">This Week</div>' : ''}
+                    </div>
+                    <button onclick="changeWeek(-1)" ${isCurrentWeek ? 'disabled' : ''}>Next →</button>
+                </div>
+            `;
+
+            weekDates.forEach(date => {
+                const dayMeals = mealsByDate[date] || [];
+                const prevDate = new Date(new Date(date).setDate(new Date(date).getDate() - 1))
+                    .toISOString().split('T')[0];
+                const prevDayMeals = mealsByDate[prevDate] || [];
+
+                const firstMeal = dayMeals[0];
+                const lastMealPrev = prevDayMeals[prevDayMeals.length - 1];
+                const fasting = calculateFastingTime(firstMeal, lastMealPrev);
+
+                const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+                const isToday = date === new Date().toISOString().split('T')[0];
+
+                html += `
+                    <div class="day-card ${isToday ? 'today' : ''}">
+                        <div class="day-header">
+                            <div>
+                                <span class="day-name">${dayName}</span>
+                                <span class="day-date">${formatDate(date)}</span>
+                            </div>
+                            <span class="meal-count">${dayMeals.length} meals</span>
+                        </div>
+                        ${fasting ? 
+                            `<div class="day-fasting">${fasting.hours}h ${fasting.minutes}m</div>` :
+                            `<div class="no-data">No fasting data</div>`
+                        }
+                    </div>
+                `;
+            });
+
+            document.getElementById('weekView').innerHTML = html;
+        }
+
+        function renderHistoryView() {
+            const mealsByDate = getMealsByDate();
+            const sortedDates = Object.keys(mealsByDate).sort((a, b) => new Date(b) - new Date(a));
+
+            let html = '<h3 class="section-title">All Meals</h3>';
+
+            if (sortedDates.length > 0) {
+                sortedDates.forEach(date => {
+                    const dayMeals = mealsByDate[date];
+                    html += `
+                        <div class="history-card">
+                            <h4 class="history-date">${formatDate(date)}</h4>
+                    `;
+
+                    dayMeals.forEach((meal, idx) => {
+                        html += `
+                            <div class="history-meal">
+                                <div class="history-meal-info">
+                                    <span class="history-meal-label">Meal ${idx + 1}: </span>
+                                    <span class="history-meal-time">${formatTime(meal.time)}</span>
+                                </div>
+                                <button class="delete-btn" onclick="deleteMeal(${meal.id})">Delete</button>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+            } else {
+                html += `<p class="empty-state">No meals logged yet</p>`;
+            }
+
+            document.getElementById('historyView').innerHTML = html;
+        }
+
+        function changeWeek(offset) {
+            selectedWeek += offset;
+            renderWeekView();
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
